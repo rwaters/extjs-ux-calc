@@ -1,0 +1,107 @@
+@import 'compass';
+
+@mixin button-gradient($direction, $bg-color) {
+    @include background-image(linear-gradient($direction, color_stops(
+        $bg-color,
+        adjust-color($bg-color, $hue: 0deg, $saturation: 0%, $lightness: -2.353%) 48%,
+        adjust-color($bg-color, $hue: 0deg, $saturation: 0%, $lightness: -11.373%) 52%,
+        adjust-color($bg-color, $hue: 0deg, $saturation: 0%, $lightness: -9.412%)
+    )));
+}
+
+@mixin flat-gradient($direction, $top-color, $bottom-color) {
+    @include background-image(linear-gradient($direction, color_stops($top-color, $bottom-color)))
+}
+
+$ux-calc-background: #999 !default;
+$ux-calc-input-top-color: #fff !default;
+$ux-calc-input-bottom-color: #fff !default;
+$ux-calc-input-font-size: 24px !default;
+$ux-calc-button-height: 30px !default;
+$ux-calc-button-width: 40px !default;
+$ux-calc-button-margin-right: 5px !default;
+$ux-calc-button-margin-top: 5px !default;
+$ux-calc-button-font-size: 16px !default;
+$ux-calc-button-color: #fff !default;
+$ux-calc-button-border-radius: 4px !default;
+$ux-calc-button-number-base-background-color: #3B5998 !default;
+$ux-calc-button-operator-base-background-color: #bb3732 !default;
+$ux-calc-button-equals-base-background-color: #242c37 !default;
+
+@mixin ux-calc-ui(
+    $ui-label,
+    $ui-background: $ux-calc-background,
+    $ui-input-top-color: $ux-calc-input-top-color,
+    $ui-input-bottom-color: $ux-calc-input-bottom-color,
+    $ui-input-font-size: $ux-calc-input-font-size,
+    $ui-button-height: $ux-calc-button-height,
+    $ui-button-width: $ux-calc-button-width,
+    $ui-button-margin-right: $ux-calc-button-margin-right,
+    $ui-button-margin-top: $ux-calc-button-margin-top,
+    $ui-button-font-size: $ux-calc-button-font-size,
+    $ui-button-color: $ux-calc-button-color,
+    $ui-button-border-radius: $ux-calc-button-border-radius,
+    $ui-button-number-base-background: $ux-calc-button-number-base-background-color,
+    $ui-button-operator-base-background: $ux-calc-button-operator-base-background-color,
+    $ui-button-equals-base-background: $ux-calc-button-equals-base-background-color
+){
+    .x-calculator-#{$ui-label} {
+        input {
+            height: $ui-button-height * 2;
+            width: 175px;
+            text-align: right;
+            font-size: $ui-input-font-size;
+            border: none;
+            @include flat-gradient(top, $ui-input-top-color, $ui-input-bottom-color);
+        }
+
+        background: $ui-background;
+        padding: 5px 0 5px 5px;
+        @include border-radius(5px);
+
+        .x-calc-btn {
+            cursor: pointer;
+            display: inline-block;
+            height: $ui-button-height;
+            width: $ui-button-width;
+            line-height: $ui-button-height;
+            margin-right: $ui-button-margin-right;
+            margin-top: $ui-button-margin-top;
+            text-align: center;
+            color: $ui-button-color;
+            font-size: $ui-button-font-size;
+            @if $ui-button-border-radius != null {
+                @include border-radius($ui-button-border-radius);
+            }
+            @include button-gradient(top, $ui-button-number-base-background);
+            @include box-shadow(inset 0 2px 2px -2px #fff, inset 0 -2px 2px -2px #000);
+        }
+
+        .x-calc-clear, .x-calc-negative, .x-calc-divide, .x-calc-multiply, .x-calc-minus, .x-calc-plus {
+            @include button-gradient(top, $ui-button-operator-base-background);
+        }
+
+        .x-calc-zero {
+            width: ($ui-button-width * 2) + $ui-button-margin-right;
+        }
+
+        .x-calc-equals {
+            height: $ui-button-height * 2 + $ui-button-margin-top;
+            float: right;
+            line-height: $ui-button-height * 3 + $ui-button-margin-top;
+            @include button-gradient(top, $ui-button-equals-base-background);
+        }
+    }
+};
+
+@include ux-calc-ui('default');
+
+@include ux-calc-ui(
+    'apple',
+    $ui-input-top-color: #edefe1,
+    $ui-input-bottom-color: #e9ebda,
+    $ui-background: url(../images/calc-apple-bg.png),
+    $ui-button-number-base-background: #5c5c5c,
+    $ui-button-operator-base-background: #8a7b73,
+    $ui-button-equals-base-background: #f99c4f
+);
