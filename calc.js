@@ -50,11 +50,11 @@ Ext.define('Ext.ux.Calculator',{
         '+/-': {
             action: 'ToggleNegative'
         },
-        '÷': {
+        '\u00F7': {
             action: 'Operation',
             operator: '/'
         },
-        '×': {
+        '\u00D7': {
             action: 'Operation',
             operator: '*'
         },
