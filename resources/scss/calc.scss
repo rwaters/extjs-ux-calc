@@ -48,7 +48,7 @@ $ux-calc-button-equals-base-background-color: #242c37 !default;
     .x-calculator-#{$ui-label} {
         input {
             height: $ui-button-height * 2;
-            width: 175px;
+            width: ($ui-button-width * 4) + ($ui-button-margin-right * 3);
             text-align: right;
             font-size: $ui-input-font-size;
             border: none;
@@ -75,6 +75,15 @@ $ux-calc-button-equals-base-background-color: #242c37 !default;
             }
             @include button-gradient(top, $ui-button-number-base-background);
             @include box-shadow(inset 0 2px 2px -2px #fff, inset 0 -2px 2px -2px #000);
+        }
+
+        .x-calc-btn-marker {
+            pointer-events: none;
+            height: $ui-button-height + 2;
+            width: $ui-button-width + 3;
+            position: absolute;
+            background: transparent;
+            border: 2px solid #fff;
         }
 
         .x-calc-clear, .x-calc-negative, .x-calc-divide, .x-calc-multiply, .x-calc-minus, .x-calc-plus {

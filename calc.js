@@ -5,7 +5,8 @@ Ext.define('Ext.ux.Calculator',{
     baseCls: Ext.baseCSSPrefix + 'calculator',
     cls: Ext.baseCSSPrefix + 'unselectable',
     width: 185,
-
+    ui: 'default',
+    
     renderTpl: [
         '<input type="text" id="{id}-display" class="{clsPrefix}-display" />',
         '<br/>',
@@ -71,7 +72,8 @@ Ext.define('Ext.ux.Calculator',{
     },
 
     initComponent: function() {
-        var me = this;
+        var me             = this,
+            buttonSelector = '.' + me.clsPrefix + '-btn';
 
         Ext.apply(me,{
             renderData: {
@@ -82,7 +84,28 @@ Ext.define('Ext.ux.Calculator',{
                     click: {
                         fn: me.onButtonClick,
                         scope: me,
-                        delegate: '.' + me.clsPrefix + '-btn'
+                        delegate: buttonSelector
+                    },
+                    keydown: {
+                        fn: function(e, t) {
+                            var key = e.getKey();
+                            if ((key < Ext.EventObject.NUM_ZERO || key > Ext.EventObject.NUM_NINE)
+                                && (key < Ext.EventObject.ZERO || key > Ext.EventObject.NINE)
+                                && key != Ext.EventObject.NUM_PERIOD
+                                && key != Ext.EventObject.BACKSPACE
+                                && key != Ext.EventObject.LEFT
+                                && key != Ext.EventObject.RIGHT
+                            ) {
+                                e.stopEvent();
+                                return false;
+                            } else {
+                                Ext.Function.defer(function() {
+                                    me.value = t.value;
+                                }, 1);
+                            }
+                        },
+                        scope: me,
+                        delegate: 'input'
                     }
                 }
             }
@@ -97,19 +120,43 @@ Ext.define('Ext.ux.Calculator',{
         me.syncDisplay();
     },
 
+    getButtonActiveMarker: function() {
+        var me = this;
+        if (!me.activeMarker) {
+            me.activeMarker = me.getEl().createChild({
+                cls: me.clsPrefix + '-btn ' + me.clsPrefix + '-btn-marker'
+            });
+        }
+        return me.activeMarker;
+    },
+
+    _hackFirstMarkerDisplay: true,
+    applyMarker: function(target) {
+        var me      = this,
+            marker  = me.getButtonActiveMarker(),
+            yOffset = -1;
+
+        if (me._hackFirstMarkerDisplay) {
+            me._hackFirstMarkerDisplay = false;
+            yOffset = -6;
+        }
+        marker.show();
+        marker.alignTo(target, 'tl-tl', [-1, yOffset]);
+    },
+
     onButtonClick: function(event, target) {
         var me      = this,
             value   = target.innerHTML,
             command = me.commands[value],
             action  = command && command.action || 'Number';
 
-        if (action != 'Number' && action != 'Clear') {
+        if (command == me.cmdPressed || action == 'Equals') {
             if (me.cmdPressed && me.stashedValue && me.value) {
                 me.executeCmd();
             }
         }
 
-        me['do'+action](value, command);
+        me['do'+action](value, command, target);
 
         me.syncDisplay();
     },
@@ -125,11 +172,12 @@ Ext.define('Ext.ux.Calculator',{
         }
     },
 
-    doOperation: function(value, command) {
+    doOperation: function(value, command, target) {
         var me = this;
         me.stashedValue = me.value;
         me.cmdPressed = command;
         me.numberEdit = false;
+        me.applyMarker(target);
     },
 
     doClear: function(clearStash) {
@@ -137,14 +185,16 @@ Ext.define('Ext.ux.Calculator',{
         if (clearStash) {
             me.stashedValue = '';
         }
-        me.value = '';
+        me.value = '0';
+        me.getButtonActiveMarker().hide();
     },
 
     doToggleNegative: function() {
         var me    = this;
             isNeg = me.value.charAt(0) == '-';
-
-        me.value = isNeg ? me.value.substring(1) : '-' + me.value;
+        if (me.value != '0') {
+            me.value = isNeg ? me.value.substring(1) : '-' + me.value;
+        }
     },
 
     doEquals: function() {
@@ -165,6 +215,7 @@ Ext.define('Ext.ux.Calculator',{
         me.stashedValue = '';
         me.cmdPressed = false;
         me.numberEdit = false;
+        me.getButtonActiveMarker().hide();
     },
 
     syncDisplay: function() {
