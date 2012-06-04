@@ -92,6 +92,7 @@ Ext.define('Ext.ux.Calculator',{
                             if ((key < Ext.EventObject.NUM_ZERO || key > Ext.EventObject.NUM_NINE)
                                 && (key < Ext.EventObject.ZERO || key > Ext.EventObject.NINE)
                                 && key != Ext.EventObject.NUM_PERIOD
+                                && key != 190 // Non num pad period
                                 && key != Ext.EventObject.BACKSPACE
                                 && key != Ext.EventObject.LEFT
                                 && key != Ext.EventObject.RIGHT
@@ -99,6 +100,7 @@ Ext.define('Ext.ux.Calculator',{
                                 e.stopEvent();
                                 return false;
                             } else {
+                                // Must delay since in keydown value hasn't actually been changed yet
                                 Ext.Function.defer(function() {
                                     me.value = t.value;
                                 }, 1);
